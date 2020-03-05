@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "mychart.fullname" . }}
+  labels:
+    {{- include "mychart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mychart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mychart.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 0
+      initContainers:
+        - name: init-{{ .Chart.Name }}
+          image: {{ .Values.deployment.image }}
+          command:
+            [
+              "sh",
+              "-c",
+              " mkdir -p $JOB_DEST; cp $JOB_SRC $JOB_DEST/config.xml; chown jenkins $JOB_DEST/config.xml"
+            ]
+          env:
+            - name: JOB_SRC
+              value: /volumes/job/config.xml
+            - name: JOB_DEST
+              value: /volumes/jenkins_home/jobs/mytomcat
+          volumeMounts:
+            - name: jenkins-home
+              mountPath: /volumes/jenkins_home
+            - name: jenkins-job-config
+              mountPath: /volumes/job
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.deployment.image }}
+          env:
+            - name: JAVA_OPTS
+              value: -Djenkins.install.runSetupWizard={{ .Values.deployment.runSetupWizard}}
+            - name: JENKINS_OPTS
+              value: --httpPort={{ .Values.deployment.containerPort}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.deployment.containerPort}}
+          volumeMounts:
+            - name: jenkins-home
+              mountPath: /var/jenkins_home
+            - name: dockersocket
+              mountPath: /var/run/docker.sock
+      volumes:
+        - name: jenkins-home
+          persistentVolumeClaim:
+            claimName: {{ template "mychart.pvc" . }}
+        - name: jenkins-job-config
+          configMap:
+            name: {{ template "mychart.configmap" . }}
+        - name: dockersocket
+          hostPath:
+            path: /var/run/docker.sock
+            type: ""

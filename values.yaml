@@ -1,0 +1,14 @@
+deployment:
+  image: chloeraven/jenkins:1.0
+  replicaCount: 1
+  containerPort: 8085
+  runSetupWizard: false
+
+service:
+  type: LoadBalancer
+  port: 8085
+
+pvc:
+  accessMode: ReadWriteOnce
+  storage: 2Gi
+
