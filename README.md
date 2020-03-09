@@ -26,20 +26,21 @@ Check out my [Helm Chart for Jenkins](https://github.com/adanilova/jenkins-chart
 *path:jenkins-chart/values.yaml*
 
 For deployment:
-| Name              | Default Value       |Defenition   |
+| Name              | Default Value       |Difinition   |
 |-----------------------|---------------------|---------------------|
 | `image` | `chloeraven/jenkins:1.0` |Docker image|
 | `containerPort` | `8085` |self-explanatory
 |`replicaCount` | `1` |self-explanatory
 |`runSetupWizard` | `false` |self-explanatory
+
 For service:
-| Name              | Default Value       |Defenition   |
+| Name              | Default Value       |Difinition   |
 |-----------------------|---------------------|---------------------|
 |`type` |` LoadBalancer` |An abstract way to expose an application running on a set of Pods as a network service.
 |`port` | `8085 `|self-explanatory
 
 For pvc:
-| Name              | Default Value       |Defenition   |
+| Name              | Default Value       |Difinition   |
 |-----------------------|---------------------|---------------------|
 |accessMode|`ReadWriteOnce`|self-explanatory|
 |storage|`2Gi`|self-explanatory|
